@@ -1,6 +1,6 @@
-# Tiny Tetris — (Not Tiny, Just Ambitious)
+# Tiny Tetris
 
-Welcome to your very own microscopic Tetris. This project runs at a scale where pixels are a personality trait.
+Welcome to your very own microscopic Tetris that I vibe coded just fot the fun of it. This project runs at a scale where pixels 1x1.
 
 ## Quick Start
 

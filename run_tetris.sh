@@ -1,3 +1,3 @@
 #!/bin/bash
 
-run python3 tetris.py -p 2
+run python3 tetris.py -p 4

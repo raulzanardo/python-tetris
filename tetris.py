@@ -250,6 +250,8 @@ def main():
     # Parse command-line args for pixel size
     parser = argparse.ArgumentParser(
         description="Play tiny Tetris; set pixel size with -p/--pixel-size")
+    # Ensure we reference the module-level GRID_SIZE (avoid local shadowing)
+    global GRID_SIZE
     parser.add_argument('-p', '--pixel-size', type=int, default=GRID_SIZE,
                         help='Size in pixels for each grid cell (integer >= 1)')
     args = parser.parse_args()

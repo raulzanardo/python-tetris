@@ -271,6 +271,29 @@ def main():
                         if game.valid_move(game.current_piece, 0, 1, 0):
                             game.current_piece.y += 1
 
+            # Handle D-pad / hat (digital directionals)
+            if event.type == pygame.JOYHATMOTION:
+                try:
+                    hat_x, hat_y = event.value
+                except Exception:
+                    # Older pygame variants may pack hat differently
+                    hat_x, hat_y = event.value[0], event.value[1]
+                print("Hat motion:", (hat_x, hat_y))
+                # Horizontal movement
+                if hat_x < 0:
+                    if game.valid_move(game.current_piece, -1, 0, 0):
+                        game.current_piece.x -= 1
+                elif hat_x > 0:
+                    if game.valid_move(game.current_piece, 1, 0, 0):
+                        game.current_piece.x += 1
+                # Vertical: down for soft drop, up for rotate
+                if hat_y < 0:  # down
+                    if game.valid_move(game.current_piece, 0, 1, 0):
+                        game.current_piece.y += 1
+                elif hat_y > 0:  # up -> rotate
+                    if game.valid_move(game.current_piece, 0, 0, 1):
+                        game.current_piece.rotation += 1
+
             if event.type == pygame.JOYBUTTONDOWN:
                 # Button 0 (A) or Button 1 (B) for rotation
                 if event.button == 0 or event.button == 1:

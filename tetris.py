@@ -128,6 +128,7 @@ class Tetris:
         self.grid = [[0 for _ in range(width)] for _ in range(height)]
         self.current_piece = self.new_piece()
         self.game_over = False
+        self.game_over_time = None
         self.score = 0  # Add score attribute
 
     def new_piece(self):
@@ -180,6 +181,11 @@ class Tetris:
         # Check if the game is over
         if not self.valid_move(self.current_piece, 0, 0, 0):
             self.game_over = True
+            # Record the time the game ended (milliseconds)
+            try:
+                self.game_over_time = pygame.time.get_ticks()
+            except Exception:
+                self.game_over_time = None
         return lines_cleared
 
     def update(self):
@@ -215,11 +221,14 @@ def draw_score(screen, score, x, y):
     screen.blit(text, (x, y))
 
 
-def draw_game_over(screen, x, y):
-    """Draw the game over text on the screen"""
-    font = pygame.font.Font(None, 48)
+def draw_game_over(screen):
+    """Draw the game over text centered on the screen"""
+    # Use a font size proportional to screen height
+    font_size = max(12, int(HEIGHT * 0.15))
+    font = pygame.font.Font(None, font_size)
     text = font.render("Game Over", True, RED)
-    screen.blit(text, (x, y))
+    rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(text, rect)
 
 
 def main():
@@ -235,11 +244,16 @@ def main():
     while True:
         # Fill the screen with black
         screen.fill(BLACK)
+        # Track whether a key was pressed this frame
+        keydown_event = False
         for event in pygame.event.get():
             # Check for the QUIT event
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                keydown_event = True
 
             # Add joystick button and axis events
             if event.type == pygame.JOYAXISMOTION:
@@ -268,6 +282,11 @@ def main():
                         game.current_piece.y += 1
                     game.lock_piece(game.current_piece)
 
+            # If any keydown while game over, restart immediately
+            if event.type == pygame.KEYDOWN and game.game_over:
+                game = Tetris(WIDTH // GRID_SIZE, HEIGHT // GRID_SIZE)
+                fall_time = 0
+
         # Get the number of milliseconds since the last frame
         delta_time = clock.get_rawtime()
         # Add the delta time to the fall time
@@ -282,14 +301,18 @@ def main():
         # Draw the grid and the current piece
         game.draw(screen)
         if game.game_over:
-            # Draw the "Game Over" message
-            draw_game_over(screen, WIDTH // 2 - 100, HEIGHT //
-                           2 - 30)  # Draw the "Game Over" message
-            # You can add a "Press any key to restart" message here
-            # Check for the KEYDOWN event
-            if event.type == pygame.KEYDOWN:
-                # Create a new Tetris object
+            # Draw the centered "Game Over" message
+            draw_game_over(screen)
+            # Ensure we have a recorded end time
+            if game.game_over_time is None:
+                try:
+                    game.game_over_time = pygame.time.get_ticks()
+                except Exception:
+                    game.game_over_time = None
+            # Auto-restart after 5 seconds
+            if game.game_over_time is not None and pygame.time.get_ticks() - game.game_over_time >= 5000:
                 game = Tetris(WIDTH // GRID_SIZE, HEIGHT // GRID_SIZE)
+                fall_time = 0
         # Update the display
         pygame.display.flip()
         # Set the framerate

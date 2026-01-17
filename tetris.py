@@ -345,14 +345,14 @@ def main():
                     if game.valid_move(game.current_piece, 0, 1, 0):
                         game.current_piece.y += 1
                 elif hat_y > 0:  # up -> rotate
-                    if game.valid_move(game.current_piece, 0, 0, 1):
-                        game.current_piece.rotation += 1
+                    if game.valid_move(game.current_piece, 0, 0, -1):
+                        game.current_piece.rotation -= 1
 
             if event.type == pygame.JOYBUTTONDOWN:
                 # Button 0 (A) or Button 1 (B) for rotation
                 if event.button == 0 or event.button == 1:
-                    if game.valid_move(game.current_piece, 0, 0, 1):
-                        game.current_piece.rotation += 1
+                    if game.valid_move(game.current_piece, 0, 0, -1):
+                        game.current_piece.rotation -= 1
                 # Button 2 (X) for hard drop
                 elif event.button == 2:
                     while game.valid_move(game.current_piece, 0, 1, 0):

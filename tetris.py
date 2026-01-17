@@ -1,6 +1,7 @@
 import sys
 import pygame
 import random
+import argparse
 
 pygame.init()
 pygame.joystick.init()
@@ -246,6 +247,14 @@ def draw_game_over(screen):
 
 
 def main():
+    # Parse command-line args for pixel size
+    parser = argparse.ArgumentParser(
+        description="Play tiny Tetris; set pixel size with -p/--pixel-size")
+    parser.add_argument('-p', '--pixel-size', type=int, default=GRID_SIZE,
+                        help='Size in pixels for each grid cell (integer >= 1)')
+    args = parser.parse_args()
+    global GRID_SIZE
+    GRID_SIZE = max(1, int(args.pixel_size))
     # Initialize pygame
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Tetris')

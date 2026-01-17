@@ -202,7 +202,8 @@ class Tetris:
         """Draw the grid and the current piece"""
         def _darken(col, amt=60):
             try:
-                return tuple(max(0, c - amt) for c in col)
+                # Scale down channels but keep a minimum to avoid pure black borders
+                return tuple(max(30, int(c * 0.6)) for c in col)
             except Exception:
                 return col
 

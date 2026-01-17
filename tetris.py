@@ -254,19 +254,8 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 keydown_event = True
-                # Print which key was pressed (human-readable name if available)
-                try:
-                    print("Key down:", pygame.key.name(
-                        event.key), f"({event.key})")
-                except Exception:
-                    print("Key down:", event.key)
 
-            if event.type == pygame.KEYUP:
-                try:
-                    print("Key up:", pygame.key.name(
-                        event.key), f"({event.key})")
-                except Exception:
-                    print("Key up:", event.key)
+            print(event.type)
 
             # Add joystick button and axis events
             if event.type == pygame.JOYAXISMOTION:

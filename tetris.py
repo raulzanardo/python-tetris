@@ -255,7 +255,6 @@ def main():
     parser.add_argument('-p', '--pixel-size', type=int, default=GRID_SIZE,
                         help='Size in pixels for each grid cell (integer >= 1)')
     args = parser.parse_args()
-    global GRID_SIZE
     GRID_SIZE = max(1, int(args.pixel_size))
     # Initialize pygame
     screen = pygame.display.set_mode((WIDTH, HEIGHT))

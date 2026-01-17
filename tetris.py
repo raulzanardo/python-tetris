@@ -206,7 +206,7 @@ class Tetris:
             except Exception:
                 return col
 
-        border_thickness = 1 if GRID_SIZE > 2 else 0
+        border_thickness = 1 if GRID_SIZE >= 2 else 0
 
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):

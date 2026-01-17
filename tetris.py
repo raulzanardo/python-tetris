@@ -200,11 +200,23 @@ class Tetris:
 
     def draw(self, screen):
         """Draw the grid and the current piece"""
+        def _darken(col, amt=60):
+            try:
+                return tuple(max(0, c - amt) for c in col)
+            except Exception:
+                return col
+
+        border_thickness = 1 if GRID_SIZE > 2 else 0
+
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
                 if cell:
-                    pygame.draw.rect(
-                        screen, cell, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1))
+                    rect = (x * GRID_SIZE, y * GRID_SIZE,
+                            GRID_SIZE - 1, GRID_SIZE - 1)
+                    pygame.draw.rect(screen, cell, rect)
+                    if border_thickness:
+                        pygame.draw.rect(screen, _darken(
+                            cell), rect, border_thickness)
 
         if self.current_piece:
             # Draw ghost/shadow at landing position (considers locked pieces)
@@ -217,14 +229,19 @@ class Tetris:
                     if cell == 'O':
                         gx = (self.current_piece.x + j) * GRID_SIZE
                         gy = (self.current_piece.y + i + ghost_dy) * GRID_SIZE
-                        pygame.draw.rect(screen, SHADOW_COLOR,
-                                         (gx, gy, GRID_SIZE - 1, GRID_SIZE - 1))
+                        rect = (gx, gy, GRID_SIZE - 1, GRID_SIZE - 1)
+                        pygame.draw.rect(screen, SHADOW_COLOR, rect)
 
             for i, row in enumerate(self.current_piece.shape[self.current_piece.rotation % len(self.current_piece.shape)]):
                 for j, cell in enumerate(row):
                     if cell == 'O':
-                        pygame.draw.rect(screen, self.current_piece.color, ((
-                            self.current_piece.x + j) * GRID_SIZE, (self.current_piece.y + i) * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1))
+                        rect = ((self.current_piece.x + j) * GRID_SIZE,
+                                (self.current_piece.y + i) * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1)
+                        pygame.draw.rect(
+                            screen, self.current_piece.color, rect)
+                        if border_thickness:
+                            pygame.draw.rect(screen, _darken(
+                                self.current_piece.color), rect, border_thickness)
 
 
 def draw_score(screen, score, x, y):

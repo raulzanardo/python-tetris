@@ -25,6 +25,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+SHADOW_COLOR = (100, 100, 100)
 COLORS = [RED, BLUE, GREEN]
 
 # Tetromino shapes
@@ -205,6 +206,19 @@ class Tetris:
                         screen, cell, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1))
 
         if self.current_piece:
+            # Draw ghost/shadow at landing position (considers locked pieces)
+            ghost_dy = 0
+            # find how far down the piece can go
+            while self.valid_move(self.current_piece, 0, ghost_dy + 1, 0):
+                ghost_dy += 1
+            for i, row in enumerate(self.current_piece.shape[self.current_piece.rotation % len(self.current_piece.shape)]):
+                for j, cell in enumerate(row):
+                    if cell == 'O':
+                        gx = (self.current_piece.x + j) * GRID_SIZE
+                        gy = (self.current_piece.y + i + ghost_dy) * GRID_SIZE
+                        pygame.draw.rect(screen, SHADOW_COLOR,
+                                         (gx, gy, GRID_SIZE - 1, GRID_SIZE - 1))
+
             for i, row in enumerate(self.current_piece.shape[self.current_piece.rotation % len(self.current_piece.shape)]):
                 for j, cell in enumerate(row):
                     if cell == 'O':
@@ -278,7 +292,6 @@ def main():
                 except Exception:
                     # Older pygame variants may pack hat differently
                     hat_x, hat_y = event.value[0], event.value[1]
-                print("Hat motion:", (hat_x, hat_y))
                 # Horizontal movement
                 if hat_x < 0:
                     if game.valid_move(game.current_piece, -1, 0, 0):

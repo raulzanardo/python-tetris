@@ -65,11 +65,11 @@ SHAPES = [
     ],
     [
         [
-         '.....',
-         '.....',
-         '..OO.',
-         '.OO..',
-         '.....'],
+            '.....',
+            '.....',
+            '..OO.',
+            '.OO..',
+            '.....'],
         ['.....',
          '.....',
          '.OO..',
@@ -116,7 +116,8 @@ class Tetromino:
         self.x = x
         self.y = y
         self.shape = shape
-        self.color = random.choice(COLORS) # You can choose different colors for each shape
+        # You can choose different colors for each shape
+        self.color = random.choice(COLORS)
         self.rotation = 0
 
 
@@ -132,18 +133,26 @@ class Tetris:
     def new_piece(self):
         # Choose a random shape
         shape = random.choice(SHAPES)
-        # Return a new Tetromino object
-        return Tetromino(self.width // 2, 0, shape)
+        # Center spawn considering 5x5 shape templates
+        spawn_x = max(0, (self.width - 5) // 2)
+        return Tetromino(spawn_x, 0, shape)
 
     def valid_move(self, piece, x, y, rotation):
         """Check if the piece can move to the given position"""
-        for i, row in enumerate(piece.shape[(piece.rotation + rotation) % len(piece.shape)]):
+        grid_h = self.height
+        grid_w = self.width
+        shape = piece.shape[(piece.rotation + rotation) % len(piece.shape)]
+        for i, row in enumerate(shape):
             for j, cell in enumerate(row):
-                try:
-                    if cell == 'O' and (self.grid[piece.y + i + y][piece.x + j + x] != 0):
+                if cell == 'O':
+                    new_x = piece.x + j + x
+                    new_y = piece.y + i + y
+                    # Check horizontal and vertical bounds
+                    if new_x < 0 or new_x >= grid_w or new_y < 0 or new_y >= grid_h:
                         return False
-                except IndexError:
-                    return False
+                    # Check collision with existing blocks
+                    if self.grid[new_y][new_x] != 0:
+                        return False
         return True
 
     def clear_lines(self):
@@ -164,7 +173,8 @@ class Tetris:
                     self.grid[piece.y + i][piece.x + j] = piece.color
         # Clear the lines and update the score
         lines_cleared = self.clear_lines()
-        self.score += lines_cleared * 100  # Update the score based on the number of cleared lines
+        # Update the score based on the number of cleared lines
+        self.score += lines_cleared * 100
         # Create a new piece
         self.current_piece = self.new_piece()
         # Check if the game is over
@@ -185,22 +195,26 @@ class Tetris:
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
                 if cell:
-                    pygame.draw.rect(screen, cell, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1))
+                    pygame.draw.rect(
+                        screen, cell, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1))
 
         if self.current_piece:
             for i, row in enumerate(self.current_piece.shape[self.current_piece.rotation % len(self.current_piece.shape)]):
                 for j, cell in enumerate(row):
                     if cell == 'O':
-                        pygame.draw.rect(screen, self.current_piece.color, ((self.current_piece.x + j) * GRID_SIZE, (self.current_piece.y + i) * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1))
+                        pygame.draw.rect(screen, self.current_piece.color, ((
+                            self.current_piece.x + j) * GRID_SIZE, (self.current_piece.y + i) * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1))
 
 
 def draw_score(screen, score, x, y):
     """Draw the score on the screen"""
-    font = pygame.font.Font(None, 36)
+    # Make font size 10% of the screen height for a smaller score display
+    font_size = max(1, int(HEIGHT * 0.10))
+    font = pygame.font.Font(None, font_size)
     text = font.render(f"Score: {score}", True, WHITE)
     screen.blit(text, (x, y))
-    
-    
+
+
 def draw_game_over(screen, x, y):
     """Draw the game over text on the screen"""
     font = pygame.font.Font(None, 48)
@@ -220,7 +234,7 @@ def main():
     fall_speed = 50  # You can adjust this value to change the falling speed, it's in milliseconds
     while True:
         # Fill the screen with black
-        screen.fill(BLACK) 
+        screen.fill(BLACK)
         for event in pygame.event.get():
             # Check for the QUIT event
             if event.type == pygame.QUIT:
@@ -254,11 +268,10 @@ def main():
                         game.current_piece.y += 1
                     game.lock_piece(game.current_piece)
 
-
         # Get the number of milliseconds since the last frame
-        delta_time = clock.get_rawtime() 
+        delta_time = clock.get_rawtime()
         # Add the delta time to the fall time
-        fall_time += delta_time 
+        fall_time += delta_time
         if fall_time >= fall_speed:
             # Move the piece down
             game.update()
@@ -270,7 +283,8 @@ def main():
         game.draw(screen)
         if game.game_over:
             # Draw the "Game Over" message
-            draw_game_over(screen, WIDTH // 2 - 100, HEIGHT // 2 - 30)  # Draw the "Game Over" message
+            draw_game_over(screen, WIDTH // 2 - 100, HEIGHT //
+                           2 - 30)  # Draw the "Game Over" message
             # You can add a "Press any key to restart" message here
             # Check for the KEYDOWN event
             if event.type == pygame.KEYDOWN:

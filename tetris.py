@@ -212,12 +212,16 @@ class Tetris:
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
                 if cell:
-                    rect = (x * GRID_SIZE, y * GRID_SIZE,
-                            GRID_SIZE - 1, GRID_SIZE - 1)
-                    pygame.draw.rect(screen, cell, rect)
-                    if border_thickness:
-                        pygame.draw.rect(screen, _darken(
-                            cell), rect, border_thickness)
+                    ox = x * GRID_SIZE
+                    oy = y * GRID_SIZE
+                    outer_rect = (ox, oy, GRID_SIZE, GRID_SIZE)
+                    inner_size = max(0, GRID_SIZE - 2)
+                    # draw outer darker rect as border
+                    pygame.draw.rect(screen, _darken(cell), outer_rect)
+                    # draw inner fill so border is visible
+                    if inner_size > 0:
+                        inner_rect = (ox + 1, oy + 1, inner_size, inner_size)
+                        pygame.draw.rect(screen, cell, inner_rect)
 
         if self.current_piece:
             # Draw ghost/shadow at landing position (considers locked pieces)
@@ -230,19 +234,28 @@ class Tetris:
                     if cell == 'O':
                         gx = (self.current_piece.x + j) * GRID_SIZE
                         gy = (self.current_piece.y + i + ghost_dy) * GRID_SIZE
-                        rect = (gx, gy, GRID_SIZE - 1, GRID_SIZE - 1)
-                        pygame.draw.rect(screen, SHADOW_COLOR, rect)
+                        outer_rect = (gx, gy, GRID_SIZE, GRID_SIZE)
+                        inner_size = max(0, GRID_SIZE - 2)
+                        pygame.draw.rect(screen, SHADOW_COLOR, outer_rect)
+                        if inner_size > 0:
+                            inner_rect = (gx + 1, gy + 1,
+                                          inner_size, inner_size)
+                            pygame.draw.rect(screen, SHADOW_COLOR, inner_rect)
 
             for i, row in enumerate(self.current_piece.shape[self.current_piece.rotation % len(self.current_piece.shape)]):
                 for j, cell in enumerate(row):
                     if cell == 'O':
-                        rect = ((self.current_piece.x + j) * GRID_SIZE,
-                                (self.current_piece.y + i) * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1)
-                        pygame.draw.rect(
-                            screen, self.current_piece.color, rect)
-                        if border_thickness:
-                            pygame.draw.rect(screen, _darken(
-                                self.current_piece.color), rect, border_thickness)
+                        px = (self.current_piece.x + j) * GRID_SIZE
+                        py = (self.current_piece.y + i) * GRID_SIZE
+                        outer_rect = (px, py, GRID_SIZE, GRID_SIZE)
+                        inner_size = max(0, GRID_SIZE - 2)
+                        pygame.draw.rect(screen, _darken(
+                            self.current_piece.color), outer_rect)
+                        if inner_size > 0:
+                            inner_rect = (px + 1, py + 1,
+                                          inner_size, inner_size)
+                            pygame.draw.rect(
+                                screen, self.current_piece.color, inner_rect)
 
 
 def draw_score(screen, score, x, y):

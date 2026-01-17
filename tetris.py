@@ -255,8 +255,6 @@ def main():
             if event.type == pygame.KEYDOWN:
                 keydown_event = True
 
-            print(event.type)
-
             # Add joystick button and axis events
             if event.type == pygame.JOYAXISMOTION:
                 # Axis 0: Left/Right
